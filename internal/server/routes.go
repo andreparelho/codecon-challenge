@@ -7,12 +7,10 @@ import (
 )
 
 func RegisterRoutes() {
-	mux := http.NewServeMux()
-
-	mux.Handle("/user", handler.SaveUsers())
-	mux.Handle("/superusers", handler.GetSuperUsers())
-	mux.Handle("/top-countries", handler.GetSuperUsersByTopCountries())
-	mux.Handle("/active-users-per-day", handler.GetActiveUsers())
-	mux.Handle("/team-insights", handler.GetMembers())
-	mux.Handle("/evaluation", handler.Evaluation())
+	http.HandleFunc("/user", handler.SaveUsers())
+	http.HandleFunc("/superusers", handler.GetSuperUsers())
+	http.HandleFunc("/top-countries", handler.GetSuperUsersByTopCountries())
+	http.HandleFunc("/active-users-per-day", handler.GetActiveUsers())
+	http.HandleFunc("/team-insights", handler.GetMembers())
+	http.HandleFunc("/evaluation", handler.Evaluation())
 }
