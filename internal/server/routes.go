@@ -7,7 +7,7 @@ import (
 )
 
 func RegisterRoutes() {
-	http.HandleFunc("/user", handler.SaveUsers())
+	http.HandleFunc("/user", handler.SendUsersFile())
 	http.HandleFunc("/superusers", handler.GetSuperUsers())
 	http.HandleFunc("/top-countries", handler.GetSuperUsersByTopCountries())
 	http.HandleFunc("/active-users-per-day", handler.GetActiveUsers())
