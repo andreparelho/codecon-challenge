@@ -42,7 +42,7 @@ func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 				"err": err,
 			}).Error("error to get file")
 
-			w.WriteHeader(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		defer file.Close()
@@ -118,7 +118,7 @@ func GetSuperUsers(u repository.UserRepository) http.HandlerFunc {
 				"url":    r.URL,
 			}).Error("this method not supported")
 
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
 
@@ -171,7 +171,7 @@ func GetTopCountries(u repository.UserRepository) http.HandlerFunc {
 				"url":    r.URL,
 			}).Error("this method not supported")
 
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
 
@@ -234,7 +234,7 @@ func GetActiveUsers(u repository.UserRepository) http.HandlerFunc {
 				"url":    r.URL,
 			}).Error("this method not supported")
 
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
 
@@ -244,7 +244,7 @@ func GetActiveUsers(u repository.UserRepository) http.HandlerFunc {
 				"err": err,
 			}).Error("error to get active users")
 
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
