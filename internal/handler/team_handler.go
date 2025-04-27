@@ -56,7 +56,7 @@ func GetMembers(u repository.UserRepository) http.HandlerFunc {
 		logrus.WithFields(logrus.Fields{
 			"timestamp": time.Since(start),
 			"teams":     len(teams),
-		}).Info("success to get active users")
+		}).Info("success to get teams insights")
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(response)

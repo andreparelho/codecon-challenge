@@ -215,7 +215,6 @@ func (u userRepository) GetMembers() ([]TeamInsights, error) {
 		}
 	}
 
-	teamInsights = make([]TeamInsights, 0, len(team))
 	for _, t := range team {
 		teamInsights = append(teamInsights, *t)
 	}
