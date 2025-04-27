@@ -117,13 +117,8 @@ func (u userRepository) GetTopCountries() ([]Countries, error) {
 		return cf[i].Count > cf[j].Count
 	})
 
-	top := 5
-	if len(cf) < 5 {
-		top = len(cf)
-	}
-
 	var countries []Countries
-	for i := 0; i < top; i++ {
+	for i := 0; i < 5; i++ {
 		country := Countries{
 			Country: cf[i].Country,
 			Total:   cf[i].Count,
