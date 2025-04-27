@@ -2,27 +2,27 @@ package repository
 
 type User struct {
 	Id      string `json:"id"`
-	Name    string `json:"name"`
-	Age     int    `json:"age"`
+	Name    string `json:"nome"`
+	Age     int    `json:"idade"`
 	Score   int    `json:"score"`
-	Active  bool   `json:"active"`
-	Country string `json:"country"`
-	Team    Team   `json:"team"`
-	Logs    Logs   `json:"logs"`
+	Active  bool   `json:"ativo"`
+	Country string `json:"pais"`
+	Team    Team   `json:"equipe"`
+	Logs    []Logs `json:"logs"`
 }
 
 type Team struct {
-	Name     string   `json:"name"`
-	Leader   string   `json:"leader"`
-	Projects Projects `json:"projects"`
+	Name     string     `json:"nome"`
+	Leader   bool       `json:"lider"`
+	Projects []Projects `json:"projetos"`
 }
 
 type Projects struct {
-	Name      string `json:"name"`
-	Completed bool   `json:"completed"`
+	Name      string `json:"nome"`
+	Completed bool   `json:"concluido"`
 }
 
 type Logs struct {
-	Date   string `json:"date"`
-	Action string `json:"action"`
+	Date   string `json:"data"`
+	Action string `json:"acao"`
 }
