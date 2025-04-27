@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/andreparelho/codecon-challenge/internal/repository"
 	"github.com/sirupsen/logrus"
@@ -12,6 +13,7 @@ import (
 func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
+		start := time.Now()
 
 		if r.Method != http.MethodPost {
 
@@ -73,27 +75,111 @@ func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
+		userHandlerResponse := UserHandlerResponse{
+			Status: http.StatusOK,
+			Body: map[string]interface{}{
+				"timestamp":  time.Since(start).Milliseconds(),
+				"message":    "Arquivo recebido com sucesso",
+				"user_count": len(users),
+			},
+		}
+
+		var response []byte
+		if response, err = json.Marshal(userHandlerResponse); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to marshal users to response bytes")
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		w.WriteHeader(http.StatusCreated)
+		w.Write(response)
 	}
 }
 
-func GetSuperUsers() http.HandlerFunc {
+func GetSuperUsers(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		users, err := u.GetSuperusers()
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to get superusers")
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		userHandlerResponse := UserHandlerResponse{
+			Status: http.StatusOK,
+			Body: map[string]interface{}{
+				"timestamp": time.Since(start).Milliseconds(),
+				"data":      users,
+			},
+		}
+
+		var response []byte
+		if response, err = json.Marshal(userHandlerResponse); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to marshal users to response bytes")
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
+		w.Write(response)
 	}
 }
 
-func GetSuperUsersByTopCountries() http.HandlerFunc {
+func GetTopCountries(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		countries, err := u.GetTopCountries()
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to get top countries")
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		userHandlerResponse := UserHandlerResponse{
+			Status: http.StatusOK,
+			Body: map[string]interface{}{
+				"timestamp": time.Since(start).Milliseconds(),
+				"countries": countries,
+			},
+		}
+
+		var response []byte
+		if response, err = json.Marshal(userHandlerResponse); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to marshal users to response bytes")
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
+		w.Write(response)
 	}
 }
 
