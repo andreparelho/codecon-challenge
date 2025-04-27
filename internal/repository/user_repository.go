@@ -73,7 +73,7 @@ func (u userRepository) GetSuperusers() ([]User, error) {
 	var users []User
 	for obj := it.Next(); obj != nil; obj = it.Next() {
 		superUser := obj.(*User)
-		if superUser.Score > 900 && !superUser.Active {
+		if superUser.Score > 900 && superUser.Active {
 			users = append(users, *superUser)
 		}
 	}
