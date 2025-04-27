@@ -4,54 +4,76 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/andreparelho/codecon-challenge/internal/repository"
+	"github.com/sirupsen/logrus"
 )
 
-func SendUsersFile() http.HandlerFunc {
+func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusBadRequest)
+
+			logrus.WithFields(logrus.Fields{
+				"method": r.Method,
+				"url":    r.URL,
+			}).Error("this method not supported")
+
+			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
 
-		r.ParseMultipartForm(32 << 20)
+		if err := r.ParseMultipartForm(128 << 20); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to set file size")
 
-		file, handler, err := r.FormFile("file")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		file, _, err := r.FormFile("file")
 		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to get file")
+
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		defer file.Close()
 
-		path := "/data/" + handler.Filename
-		f, err := os.Create(path)
+		content, err := io.ReadAll(file)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		defer f.Close()
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to read file")
 
-		_, err = io.Copy(f, file)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		content, err := os.ReadFile(path)
-		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		var users []repository.User
-		if err := json.Unmarshal(content, &users); err != nil {
+		var users []*repository.User
+		if err := json.Unmarshal([]byte(content), &users); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to unmarshal file to users")
+
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
+		if err := u.SaveUsers(users); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to save users")
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
 	}
 }
 
