@@ -36,7 +36,7 @@ func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
-		file, _, err := r.FormFile("file")
+		file, header, err := r.FormFile("file")
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"err": err,
@@ -95,6 +95,13 @@ func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
+		logrus.WithFields(logrus.Fields{
+			"timestamp":   time.Since(start),
+			"users_total": len(users),
+			"file_size":   header.Size,
+			"file_name":   header.Filename,
+		}).Info("success to save user on database")
+
 		w.WriteHeader(http.StatusCreated)
 		w.Write(response)
 	}
@@ -142,6 +149,11 @@ func GetSuperUsers(u repository.UserRepository) http.HandlerFunc {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		logrus.WithFields(logrus.Fields{
+			"timestamp":        time.Since(start),
+			"superusers_total": len(users),
+		}).Info("success to get superusers")
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(response)
@@ -201,6 +213,11 @@ func GetTopCountries(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
+		logrus.WithFields(logrus.Fields{
+			"timestamp":       time.Since(start),
+			"total_countries": len(countries),
+		}).Info("success to get top countries")
+
 		w.WriteHeader(http.StatusOK)
 		w.Write(response)
 	}
@@ -248,6 +265,11 @@ func GetActiveUsers(u repository.UserRepository) http.HandlerFunc {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		logrus.WithFields(logrus.Fields{
+			"timestamp":    time.Since(start),
+			"active_users": len(users),
+		}).Info("success to get active users")
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(response)
