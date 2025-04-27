@@ -11,10 +11,7 @@ func main() {
 		panic(err)
 	}
 
-	w := db.Txn(true)
-	r := db.Txn(false)
-
-	u := repository.NewUserRepository(w, r)
+	u := repository.NewUserRepository(db)
 
 	server.RegisterRoutes(u)
 	server.StartServer()
