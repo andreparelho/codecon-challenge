@@ -7,11 +7,11 @@ import (
 	"github.com/andreparelho/codecon-challenge/internal/repository"
 )
 
-func RegisterRoutes(u repository.UserRepository) {
-	http.HandleFunc("/user", handler.SendUsersFile(u))
-	http.HandleFunc("/superusers", handler.GetSuperUsers(u))
-	http.HandleFunc("/top-countries", handler.GetTopCountries(u))
-	http.HandleFunc("/active-users-per-day", handler.GetActiveUsers(u))
-	http.HandleFunc("/team-insights", handler.GetMembers(u))
+func RegisterRoutes(repo repository.UserRepository) {
+	http.HandleFunc("/user", handler.SendUsersFile(repo))
+	http.HandleFunc("/superusers", handler.GetSuperUsers(repo))
+	http.HandleFunc("/top-countries", handler.GetTopCountries(repo))
+	http.HandleFunc("/active-users-per-day", handler.GetActiveUsers(repo))
+	http.HandleFunc("/team-insights", handler.GetMembers(repo))
 	http.HandleFunc("/evaluation", handler.Evaluation())
 }

@@ -11,8 +11,8 @@ func main() {
 		panic(err)
 	}
 
-	u := repository.NewUserRepository(db)
+	repo := repository.NewUserRepository(db)
 
-	server.RegisterRoutes(u)
+	server.RegisterRoutes(repo)
 	server.StartServer()
 }

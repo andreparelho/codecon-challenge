@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
+func SendUsersFile(repo repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		start := time.Now()
@@ -67,7 +67,7 @@ func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
-		if err := u.SaveUsers(users); err != nil {
+		if err := repo.SaveUsers(users); err != nil {
 			logrus.WithFields(logrus.Fields{
 				"err": err,
 			}).Error("error to save users")
@@ -107,7 +107,7 @@ func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 	}
 }
 
-func GetSuperUsers(u repository.UserRepository) http.HandlerFunc {
+func GetSuperUsers(repo repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		start := time.Now()
@@ -122,7 +122,7 @@ func GetSuperUsers(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
-		users, err := u.GetSuperusers()
+		users, err := repo.GetSuperusers()
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"err": err,
@@ -160,7 +160,7 @@ func GetSuperUsers(u repository.UserRepository) http.HandlerFunc {
 	}
 }
 
-func GetTopCountries(u repository.UserRepository) http.HandlerFunc {
+func GetTopCountries(repo repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		start := time.Now()
@@ -185,7 +185,7 @@ func GetTopCountries(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
-		countries, err := u.GetTopCountries(total)
+		countries, err := repo.GetTopCountries(total)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"err": err,
@@ -223,7 +223,7 @@ func GetTopCountries(u repository.UserRepository) http.HandlerFunc {
 	}
 }
 
-func GetActiveUsers(u repository.UserRepository) http.HandlerFunc {
+func GetActiveUsers(repo repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		start := time.Now()
@@ -238,7 +238,7 @@ func GetActiveUsers(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
-		users, err := u.GetActiveUsers()
+		users, err := repo.GetActiveUsers()
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"err": err,

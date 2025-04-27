@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func GetMembers(u repository.UserRepository) http.HandlerFunc {
+func GetMembers(repo repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		start := time.Now()
@@ -24,7 +24,7 @@ func GetMembers(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
-		teams, err := u.GetMembers()
+		teams, err := repo.GetMembers()
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"method": r.Method,
