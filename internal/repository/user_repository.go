@@ -106,34 +106,23 @@ func (u userRepository) GetTopCountries(total int) ([]Countries, error) {
 		count[user.Country]++
 	}
 
-	var cf []CountriesFrequency
+	var countries []Countries
 	for country, c := range count {
-		cf = append(cf, CountriesFrequency{
+		countries = append(countries, Countries{
 			Country: country,
-			Count:   c,
+			Total:   c,
 		})
 	}
 
-	sort.Slice(cf, func(i, j int) bool {
-		return cf[i].Count > cf[j].Count
+	sort.Slice(countries, func(i, j int) bool {
+		return countries[i].Total > countries[j].Total
 	})
-
-	var countries []Countries
 
 	if total <= 0 {
 		total = 5
 	}
 
-	for i := 0; i < total; i++ {
-		country := Countries{
-			Country: cf[i].Country,
-			Total:   cf[i].Count,
-		}
-
-		countries = append(countries, country)
-	}
-
-	return countries, nil
+	return countries[:total], nil
 }
 
 func (u userRepository) GetActiveUsers() ([]ActiveUsers, error) {
