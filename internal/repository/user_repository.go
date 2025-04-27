@@ -13,6 +13,7 @@ type UserRepository interface {
 	GetSuperusers() ([]User, error)
 	GetTopCountries(total int) ([]Countries, error)
 	GetActiveUsers() ([]ActiveUsers, error)
+	GetMembers() ([]TeamInsights, error)
 }
 
 type userRepository struct {
@@ -167,4 +168,57 @@ func (u userRepository) GetActiveUsers() ([]ActiveUsers, error) {
 	})
 
 	return activeUsers, nil
+}
+
+func (u userRepository) GetMembers() ([]TeamInsights, error) {
+	defer func(begin time.Time) {
+		logrus.WithFields(logrus.Fields{
+			"timestamp": time.Since(begin),
+		}).Info("success to get members")
+	}(time.Now())
+
+	txn := u.Database.Txn(false)
+	defer txn.Abort()
+
+	it, err := txn.Get("user", "id")
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err,
+		}).Error("error to get users on database")
+
+		return nil, err
+	}
+
+	team := make(map[string]*TeamInsights)
+	var teamInsights []TeamInsights
+	for obj := it.Next(); obj != nil; obj = it.Next() {
+		user := obj.(*User)
+
+		ti, ok := team[user.Team.Name]
+		if !ok {
+			ti = &TeamInsights{
+				Team: user.Team.Name,
+			}
+
+			team[user.Team.Name] = ti
+		}
+
+		ti.TotalMembers++
+		if user.Team.Leader {
+			ti.Leaders++
+		}
+
+		for _, cp := range user.Team.Projects {
+			if cp.Completed {
+				ti.CompletedProjects++
+			}
+		}
+	}
+
+	teamInsights = make([]TeamInsights, 0, len(team))
+	for _, t := range team {
+		teamInsights = append(teamInsights, *t)
+	}
+
+	return teamInsights, nil
 }

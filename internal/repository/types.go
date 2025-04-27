@@ -36,3 +36,11 @@ type ActiveUsers struct {
 	Date  string `json:"date"`
 	Total int    `json:"total"`
 }
+
+type TeamInsights struct {
+	Team              string `json:"team"`
+	TotalMembers      int    `json:"total_members"`
+	Leaders           int    `json:"leaders"`
+	CompletedProjects int    `json:"completed_projects"`
+	ActivePercentage  int    `json:"active_percentage"`
+}

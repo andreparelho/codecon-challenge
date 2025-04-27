@@ -12,6 +12,6 @@ func RegisterRoutes(u repository.UserRepository) {
 	http.HandleFunc("/superusers", handler.GetSuperUsers(u))
 	http.HandleFunc("/top-countries", handler.GetTopCountries(u))
 	http.HandleFunc("/active-users-per-day", handler.GetActiveUsers(u))
-	http.HandleFunc("/team-insights", handler.GetMembers())
+	http.HandleFunc("/team-insights", handler.GetMembers(u))
 	http.HandleFunc("/evaluation", handler.Evaluation())
 }
