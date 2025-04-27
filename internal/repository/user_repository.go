@@ -12,6 +12,7 @@ type UserRepository interface {
 	SaveUsers(user []*User) error
 	GetSuperusers() ([]User, error)
 	GetTopCountries(total int) ([]Countries, error)
+	GetActiveUsers() ([]ActiveUsers, error)
 }
 
 type userRepository struct {
@@ -133,4 +134,42 @@ func (u userRepository) GetTopCountries(total int) ([]Countries, error) {
 	}
 
 	return countries, nil
+}
+
+func (u userRepository) GetActiveUsers() ([]ActiveUsers, error) {
+	var activeUsers []ActiveUsers
+
+	txn := u.Database.Txn(false)
+	defer txn.Abort()
+
+	it, err := txn.Get("user", "id")
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"err": err,
+		}).Error("error to get users on database")
+
+		return nil, err
+	}
+
+	count := make(map[string]int)
+	for obj := it.Next(); obj != nil; obj = it.Next() {
+		user := obj.(*User)
+
+		for _, log := range user.Logs {
+			count[log.Date]++
+		}
+	}
+
+	for date, t := range count {
+		activeUsers = append(activeUsers, ActiveUsers{
+			Date:  date,
+			Total: t,
+		})
+	}
+
+	sort.Slice(activeUsers, func(i, j int) bool {
+		return activeUsers[i].Total > activeUsers[j].Total
+	})
+
+	return activeUsers, nil
 }

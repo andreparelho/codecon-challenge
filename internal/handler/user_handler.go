@@ -206,12 +206,50 @@ func GetTopCountries(u repository.UserRepository) http.HandlerFunc {
 	}
 }
 
-func GetActiveUsers() http.HandlerFunc {
+func GetActiveUsers(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+		start := time.Now()
+
 		if r.Method != http.MethodGet {
+			logrus.WithFields(logrus.Fields{
+				"method": r.Method,
+				"url":    r.URL,
+			}).Error("this method not supported")
+
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		users, err := u.GetActiveUsers()
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to get active users")
+
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		userHandlerResponse := UserHandlerResponse{
+			Status: http.StatusOK,
+			Body: map[string]interface{}{
+				"timestamp": time.Since(start).Milliseconds(),
+				"logins":    users,
+			},
+		}
+
+		var response []byte
+		if response, err = json.Marshal(userHandlerResponse); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to marshal users to response bytes")
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
+		w.Write(response)
 	}
 }

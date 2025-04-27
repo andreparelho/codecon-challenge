@@ -36,3 +36,8 @@ type Countries struct {
 	Country string `json:"country"`
 	Total   int    `json:"total"`
 }
+
+type ActiveUsers struct {
+	Date  string `json:"date"`
+	Total int    `json:"total"`
+}
