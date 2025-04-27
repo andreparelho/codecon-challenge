@@ -11,7 +11,7 @@ import (
 type UserRepository interface {
 	SaveUsers(user []*User) error
 	GetSuperusers() ([]User, error)
-	GetTopCountries() ([]Countries, error)
+	GetTopCountries(total int) ([]Countries, error)
 }
 
 type userRepository struct {
@@ -80,11 +80,11 @@ func (u userRepository) GetSuperusers() ([]User, error) {
 	return users, nil
 }
 
-func (u userRepository) GetTopCountries() ([]Countries, error) {
+func (u userRepository) GetTopCountries(total int) ([]Countries, error) {
 	defer func(begin time.Time) {
 		logrus.WithFields(logrus.Fields{
 			"timestamp": time.Since(begin),
-		}).Info("success to get superusers")
+		}).Info("success to get topcountries")
 	}(time.Now())
 
 	txn := u.Database.Txn(false)
@@ -118,7 +118,12 @@ func (u userRepository) GetTopCountries() ([]Countries, error) {
 	})
 
 	var countries []Countries
-	for i := 0; i < 5; i++ {
+
+	if total <= 0 {
+		total = 5
+	}
+
+	for i := 0; i < total; i++ {
 		country := Countries{
 			Country: cf[i].Country,
 			Total:   cf[i].Count,

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/andreparelho/codecon-challenge/internal/repository"
@@ -101,9 +102,15 @@ func SendUsersFile(u repository.UserRepository) http.HandlerFunc {
 
 func GetSuperUsers(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
 		start := time.Now()
 
 		if r.Method != http.MethodGet {
+			logrus.WithFields(logrus.Fields{
+				"method": r.Method,
+				"url":    r.URL,
+			}).Error("this method not supported")
+
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -143,14 +150,30 @@ func GetSuperUsers(u repository.UserRepository) http.HandlerFunc {
 
 func GetTopCountries(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
 		start := time.Now()
 
 		if r.Method != http.MethodGet {
+			logrus.WithFields(logrus.Fields{
+				"method": r.Method,
+				"url":    r.URL,
+			}).Error("this method not supported")
+
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		countries, err := u.GetTopCountries()
+		total, err := strconv.Atoi(r.URL.Query().Get("total"))
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"err": err,
+			}).Error("error to get path param")
+
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		countries, err := u.GetTopCountries(total)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"err": err,
