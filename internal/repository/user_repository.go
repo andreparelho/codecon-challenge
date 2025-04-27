@@ -219,5 +219,9 @@ func (u userRepository) GetMembers() ([]TeamInsights, error) {
 		teamInsights = append(teamInsights, *t)
 	}
 
+	sort.Slice(teamInsights, func(i, j int) bool {
+		return teamInsights[i].TotalMembers > teamInsights[j].TotalMembers
+	})
+
 	return teamInsights, nil
 }
