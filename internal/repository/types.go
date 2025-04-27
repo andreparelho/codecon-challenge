@@ -26,3 +26,8 @@ type Logs struct {
 	Date   string `json:"data"`
 	Action string `json:"acao"`
 }
+
+type CountriesFrequency struct {
+	Country string
+	Count   int
+}
