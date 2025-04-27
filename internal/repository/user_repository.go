@@ -137,6 +137,12 @@ func (u userRepository) GetTopCountries(total int) ([]Countries, error) {
 }
 
 func (u userRepository) GetActiveUsers() ([]ActiveUsers, error) {
+	defer func(begin time.Time) {
+		logrus.WithFields(logrus.Fields{
+			"timestamp": time.Since(begin),
+		}).Info("success to get active users")
+	}(time.Now())
+
 	var activeUsers []ActiveUsers
 
 	txn := u.Database.Txn(false)
