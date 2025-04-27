@@ -31,3 +31,8 @@ type CountriesFrequency struct {
 	Country string
 	Count   int
 }
+
+type Countries struct {
+	Country string `json:"country"`
+	Total   int    `json:"total"`
+}

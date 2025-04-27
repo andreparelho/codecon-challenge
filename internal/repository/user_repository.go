@@ -11,7 +11,7 @@ import (
 type UserRepository interface {
 	SaveUsers(user []*User) error
 	GetSuperusers() ([]User, error)
-	GetTopCountries() ([]string, error)
+	GetTopCountries() ([]Countries, error)
 }
 
 type userRepository struct {
@@ -80,7 +80,7 @@ func (u userRepository) GetSuperusers() ([]User, error) {
 	return users, nil
 }
 
-func (u userRepository) GetTopCountries() ([]string, error) {
+func (u userRepository) GetTopCountries() ([]Countries, error) {
 	defer func(begin time.Time) {
 		logrus.WithFields(logrus.Fields{
 			"timestamp": time.Since(begin),
@@ -106,10 +106,10 @@ func (u userRepository) GetTopCountries() ([]string, error) {
 	}
 
 	var cf []CountriesFrequency
-	for country, count := range count {
+	for country, c := range count {
 		cf = append(cf, CountriesFrequency{
 			Country: country,
-			Count:   count,
+			Count:   c,
 		})
 	}
 
@@ -122,9 +122,14 @@ func (u userRepository) GetTopCountries() ([]string, error) {
 		top = len(cf)
 	}
 
-	var countries []string
+	var countries []Countries
 	for i := 0; i < top; i++ {
-		countries = append(countries, cf[i].Country)
+		country := Countries{
+			Country: cf[i].Country,
+			Total:   cf[i].Count,
+		}
+
+		countries = append(countries, country)
 	}
 
 	return countries, nil
